@@ -1,0 +1,8 @@
+# python
+*.egg-info
+*.pyc
+/[.]venv*
+dist
+
+# aoc
+input.txt
