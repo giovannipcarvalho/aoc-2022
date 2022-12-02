@@ -29,6 +29,10 @@ moves = {
 }
 
 
+wins = {"rock": "scissors", "paper": "rock", "scissors": "paper"}
+loses = {v: k for k, v in wins.items()}
+
+
 def outcome(opponent: str, me: str) -> str:
     """
     Returns the outcome of the game
@@ -36,21 +40,12 @@ def outcome(opponent: str, me: str) -> str:
     - D: draw
     - W: win
     """
-    m1, m2 = moves[opponent], moves[me]
-    match (m1, m2):
-        case ("rock", "paper"):
-            return "W"
-        case ("rock", "scissors"):
-            return "L"
-        case ("paper", "scissors"):
-            return "W"
-        case ("paper", "rock"):
-            return "L"
-        case ("scissors", "rock"):
-            return "W"
-        case ("scissors", "paper"):
-            return "L"
-    return "D"
+    if opponent == me:
+        return "D"
+    if me in wins[opponent]:
+        return "L"
+    else:
+        return "W"
 
 
 plays = []
@@ -61,8 +56,9 @@ with open("input.txt") as f:
 
 total_points = 0
 for play in plays:
-    opponent, me = play
-    total_points += points[me]
+    opponent = moves[play[0]]
+    me = moves[play[1]]
+    total_points += points[play[1]]
     total_points += points[outcome(opponent, me)]
 
 print("part 1:", total_points)
