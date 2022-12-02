@@ -11,9 +11,9 @@
 # win  = 6
 
 points = {
-    "X": 1,  # rock
-    "Y": 2,  # paper
-    "Z": 3,  # scissors
+    "rock": 1,  # rock
+    "paper": 2,  # paper
+    "scissors": 3,  # scissors
     "L": 0,  # lose
     "D": 3,  # draw
     "W": 6,  # win
@@ -58,7 +58,30 @@ total_points = 0
 for play in plays:
     opponent = moves[play[0]]
     me = moves[play[1]]
-    total_points += points[play[1]]
+    total_points += points[me]
     total_points += points[outcome(opponent, me)]
 
 print("part 1:", total_points)
+
+outcome_mapping = {
+    "X": "lose",
+    "Y": "draw",
+    "Z": "win",
+}
+
+total_points = 0
+for play in plays:
+    opponent = moves[play[0]]
+
+    desired_outcome = outcome_mapping[play[1]]
+    if desired_outcome == "win":
+        me = loses[opponent]
+    elif desired_outcome == "lose":
+        me = wins[opponent]
+    else:
+        me = opponent
+
+    total_points += points[me]
+    total_points += points[outcome(opponent, me)]
+
+print("part 2:", total_points)
