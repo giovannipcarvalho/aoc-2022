@@ -27,10 +27,8 @@ def badge(group):
     Find the badge for a group of sacks.
     The common item among all sacks is the badge.
     """
-    x = set(group[0])
-    for sack in group:
-        x = x & set(sack)
-    return "".join(x)
+    sacks = [set(s) for s in group]
+    return "".join(set.intersection(*sacks))
 
 
 def sum_priorities_for_group_badges(s: str) -> int:
