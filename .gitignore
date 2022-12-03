@@ -1,3 +1,6 @@
+# general
+.env
+
 # python
 *.egg-info
 *.pyc
