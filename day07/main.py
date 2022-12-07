@@ -1,5 +1,6 @@
 import os.path
 from collections import defaultdict
+from typing import Iterable
 
 sample_input = """\
 $ cd /
@@ -28,13 +29,24 @@ $ ls
 """
 
 
-def parents(path: str):
+def parents(path: str) -> Iterable[str]:
+    """
+    Returns a list of all parents for a path:
+    e.g. '/a/b/c/d.txt'
+        ['', 'a', 'a/b', 'a/b/c']
+
+    The empty string is the root dir `/`.
+    """
     parts = os.path.normpath(path).split(os.path.sep)
     for n in range(1, len(parts)):
         yield os.path.join(*parts[:n])
 
 
-def traverse(s: str):
+def traverse(s: str) -> list[tuple[str, int]]:
+    """
+    Traverse a sequence of commands and outputs to generate a list of file
+    paths and sizes.
+    """
     path = ""
     files = []
     for line in s.strip().splitlines():
@@ -57,7 +69,11 @@ def traverse(s: str):
     return files
 
 
-def dir_sizes(files: dict) -> dict[str, int]:
+def dir_sizes(files: list[tuple[str, int]]) -> dict[str, int]:
+    """
+    Computes directory sizes for all directories in a tree, given a list
+    of all of its files.
+    """
     sizes: dict[str, int] = defaultdict(int)
     for file, size in files:
         for parent in parents(file):
@@ -67,6 +83,9 @@ def dir_sizes(files: dict) -> dict[str, int]:
 
 
 def sum_directories_of_size_up_to(s, max_size=100000) -> int:
+    """
+    Sum the size of all directories of total size up to `max_size`.
+    """
     sizes = dir_sizes(traverse(s))
     return sum(v for v in sizes.values() if v <= max_size)
 
