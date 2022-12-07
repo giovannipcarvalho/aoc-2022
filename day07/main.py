@@ -71,10 +71,30 @@ def sum_directories_of_size_up_to(s, max_size=100000) -> int:
     return sum(v for v in sizes.values() if v <= max_size)
 
 
+def min_delete_size(s, desired_free_space=30000000, total_disk_size=70000000) -> int:
+    """
+    Find the smallest directory size that when deleted will achieve the desired
+    free space.
+    """
+    sizes = dir_sizes(traverse(s))
+    current_total_used = sizes[""]  # root is the empty str
+    current_free_space = total_disk_size - current_total_used
+    minimum_delete_size = desired_free_space - current_free_space
+    for size in sorted(sizes.values()):
+        if size >= minimum_delete_size:
+            return size
+    return 0
+
+
 def test_sample_part1():
     assert sum_directories_of_size_up_to(sample_input) == 95437
+
+
+def test_sample_part2():
+    assert min_delete_size(sample_input) == 24933642
 
 
 if __name__ == "__main__":
     s = open("input.txt").read()
     print("part 1:", sum_directories_of_size_up_to(s))
+    print("part 2:", min_delete_size(s))
