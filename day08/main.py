@@ -15,7 +15,7 @@ def parse_trees(s: str) -> list[list[int]]:
     return trees
 
 
-def tree_is_visible(trees, i, j) -> bool:
+def tree_is_visible(trees: list[list[int]], i: int, j: int) -> bool:
     """Check if tree i, j is visible in the trees"""
     m, n = len(trees), len(trees[0])
 
@@ -56,6 +56,15 @@ def visible_trees(s: str) -> int:
 
 
 def viewing_distance(heights: list[int], height: int) -> int:
+    """
+    Computes viewing distance in a direction.
+
+    The distance between a tree and the first of higher or equal height is the
+    viewing distance in a given direction.
+
+    Edge trees have at least one direction in which their viewing distance is
+    zero, because there is no other tree in that direction.
+    """
     distance = 0
     for h in heights:
         distance += 1
@@ -65,6 +74,11 @@ def viewing_distance(heights: list[int], height: int) -> int:
 
 
 def scenic_score(trees: list[list[int]], i: int, j: int) -> int:
+    """
+    Computes scenic score for tree i,j
+
+    The scenic score is the product of the viewing distances along each direction.
+    """
     # trees in each direction
     left = trees[i][:j]
     right = trees[i][j + 1 :]
@@ -83,6 +97,7 @@ def scenic_score(trees: list[list[int]], i: int, j: int) -> int:
 
 
 def best_scenic_score(s: str) -> int:
+    """Get the best scenic score among all trees."""
     trees = parse_trees(s)
     m, n = len(trees), len(trees[0])
     return max(
