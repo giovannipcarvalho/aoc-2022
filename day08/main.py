@@ -1,3 +1,5 @@
+import itertools
+
 sample_input = """\
 30373
 25512
@@ -53,10 +55,50 @@ def visible_trees(s: str) -> int:
     return total
 
 
+def viewing_distance(heights: list[int], height: int) -> int:
+    distance = 0
+    for h in heights:
+        distance += 1
+        if h >= height:
+            break
+    return distance
+
+
+def scenic_score(trees: list[list[int]], i: int, j: int) -> int:
+    # trees in each direction
+    left = trees[i][:j]
+    right = trees[i][j + 1 :]
+    top = [row[j] for row in trees][:i]
+    bottom = [row[j] for row in trees][i + 1 :]
+
+    height = trees[i][j]
+
+    # viewing distances
+    ld = viewing_distance(left[::-1], height)
+    rd = viewing_distance(right, height)
+    td = viewing_distance(top[::-1], height)
+    bd = viewing_distance(bottom, height)
+
+    return ld * rd * td * bd
+
+
+def best_scenic_score(s: str) -> int:
+    trees = parse_trees(s)
+    m, n = len(trees), len(trees[0])
+    return max(
+        scenic_score(trees, i, j) for i, j in itertools.product(range(m), range(n))
+    )
+
+
 def test_sample_part1():
     assert visible_trees(sample_input) == 21
+
+
+def test_sample_part2():
+    assert best_scenic_score(sample_input) == 8
 
 
 if __name__ == "__main__":
     s = open("input.txt").read()
     print("part 1:", visible_trees(s))
+    print("part 2:", best_scenic_score(s))
