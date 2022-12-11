@@ -2,6 +2,7 @@ import math
 import operator
 from collections import defaultdict
 from collections import namedtuple
+from typing import Iterable
 
 sample_input = """\
 Monkey 0:
@@ -65,10 +66,10 @@ def parse_behavior(lines: list[str]):
         else:
             return case_false
 
-    return fn
+    return fn, div
 
 
-Monkey = namedtuple("Monkey", ["items", "operation", "behavior"])
+Monkey = namedtuple("Monkey", ["items", "operation", "behavior", "div"])
 
 
 def parse_monkey(s: str):
@@ -76,9 +77,9 @@ def parse_monkey(s: str):
     lines = s.splitlines()
     items = parse_items(lines[1])
     operation = parse_operation(lines[2])
-    behavior = parse_behavior(lines[3:])
+    behavior, div = parse_behavior(lines[3:])
 
-    return Monkey(items, operation, behavior)
+    return Monkey(items, operation, behavior, div)
 
 
 def solve1(s: str) -> int:
@@ -109,10 +110,55 @@ def solve1(s: str) -> int:
     return x[0] * x[1]
 
 
+def prod(vals: Iterable[int | float]):
+    """Product of a sequence"""
+    result: int | float = 1
+    for v in vals:
+        result *= v
+    return result
+
+
+def solve2(s: str, rounds=10000) -> int:
+    monkeys = {idx: parse_monkey(m) for idx, m in enumerate(s.split("\n\n"))}
+    inspections: dict[int, int] = defaultdict(int)
+
+    # new factor to reduce worry levels
+    div = prod(m.div for m in monkeys.values())
+
+    for round in range(rounds):
+        for monkey_id, monkey in monkeys.items():
+            while len(monkey.items):
+                # worry level is the item value itself
+                item = monkey.items.pop(0)
+
+                # score number of inspections
+                inspections[monkey_id] += 1
+
+                # calculate new worry level
+                item = monkey.operation(item)
+
+                # chill
+                item = item % div
+
+                # test who's getting thrown the item
+                new_monkey = monkey.behavior(item)
+
+                monkeys[new_monkey].items.append(item)
+
+    # multiply the number of inspections of the two most active monkeys
+    x = sorted(inspections.values(), reverse=True)
+    return x[0] * x[1]
+
+
 def test_sample_part1():
     assert solve1(sample_input) == 10605
+
+
+def test_sample_part2():
+    assert solve2(sample_input) == 2713310158
 
 
 if __name__ == "__main__":
     s = open("input.txt").read()
     print("part 1:", solve1(s))
+    print("part 2:", solve2(s))

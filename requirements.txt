@@ -6,3 +6,4 @@ pre-commit
 python-lsp-server
 ipython
 ipdb
+tqdm
