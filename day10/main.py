@@ -1,3 +1,5 @@
+import textwrap
+
 sample_input = """\
 addx 15
 addx -11
@@ -147,14 +149,18 @@ noop
 noop
 """
 
+expected_drawing = """\
+##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....\
+"""
 
-def solve1(s: str) -> int:
-    """
-    Computes signal strength at 20th, 60th, 100th, 140th, 180th and 220th cycles.
 
-    Signal strength is defined as cycle_number * signal_value.
-    """
-    values = [1]  # cycle 0
+def cpu(s: str) -> list[int]:
+    values = [1]  # cycle 1
 
     for instruction in s.strip().splitlines():
         match instruction.split():
@@ -166,13 +172,45 @@ def solve1(s: str) -> int:
             case _:
                 raise ValueError(f"unexpected instruction {instruction}")
 
+    return values
+
+
+def solve1(s: str) -> int:
+    """
+    Computes signal strength at 20th, 60th, 100th, 140th, 180th and 220th cycles.
+
+    Signal strength is defined as cycle_number * signal_value.
+    """
+    values = cpu(s)
     return sum(n * values[n - 1] for n in [20, 60, 100, 140, 180, 220])
+
+
+def solve2(s: str):
+    values = cpu(s)[:-1]  # ignore last cycle as values is written for the future
+    pixels = []
+
+    for idx, sprite_center in enumerate(values):
+        row_pixel = idx % 40
+        if abs(row_pixel - sprite_center) < 2:
+            pixel = "#"  # lit
+        else:
+            pixel = "."  # off
+        pixels.append(pixel)
+
+    crt = "\n".join(textwrap.wrap("".join(pixels), 40))
+    return crt
 
 
 def test_sample_part1():
     assert solve1(sample_input) == 13140
 
 
+def test_sample_part2():
+    assert solve2(sample_input) == expected_drawing
+
+
 if __name__ == "__main__":
     s = open("input.txt").read()
     print("part 1:", solve1(s))
+    print("part 2:\n")
+    print(solve2(s))
