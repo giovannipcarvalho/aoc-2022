@@ -160,6 +160,12 @@ expected_drawing = """\
 
 
 def cpu(s: str) -> list[int]:
+    """
+    Run the program instructions to compute the value of register X at each cycle.
+
+    Here I cheat a little bit, by filling the register values into a list and
+    filling future values of the register, rather than actually counting cycles.
+    """
     values = [1]  # cycle 1
 
     for instruction in s.strip().splitlines():
@@ -185,7 +191,11 @@ def solve1(s: str) -> int:
     return sum(n * values[n - 1] for n in [20, 60, 100, 140, 180, 220])
 
 
-def solve2(s: str):
+def solve2(s: str) -> str:
+    """
+    Draw the CRT screen according to the sprite positions calculated by running
+    the program instructions.
+    """
     values = cpu(s)[:-1]  # ignore last cycle as values is written for the future
     pixels = []
 
@@ -213,4 +223,5 @@ if __name__ == "__main__":
     s = open("input.txt").read()
     print("part 1:", solve1(s))
     print("part 2:\n")
+    # inspect the drawing to determine the solution
     print(solve2(s))
