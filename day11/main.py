@@ -3,7 +3,6 @@ import operator
 from collections import defaultdict
 from collections import namedtuple
 from typing import Callable
-from typing import Iterable
 
 sample_input = """\
 Monkey 0:
@@ -142,14 +141,6 @@ def solve1(s: str) -> int:
     return x[0] * x[1]
 
 
-def prod(vals: Iterable[int | float]) -> int | float:
-    """Product of a sequence"""
-    result: int | float = 1
-    for v in vals:
-        result *= v
-    return result
-
-
 def solve2(s: str, rounds: int = 10000) -> int:
     """
     Run 10_000 rounds of monkey business.
@@ -162,7 +153,7 @@ def solve2(s: str, rounds: int = 10000) -> int:
     inspections: dict[int, int] = defaultdict(int)
 
     # new factor to reduce worry levels
-    div = prod(m.div for m in monkeys.values())
+    div = math.prod(m.div for m in monkeys.values())
 
     for round in range(rounds):
         for monkey_id, monkey in monkeys.items():
