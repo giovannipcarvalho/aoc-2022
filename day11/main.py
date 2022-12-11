@@ -2,6 +2,7 @@ import math
 import operator
 from collections import defaultdict
 from collections import namedtuple
+from typing import Callable
 from typing import Iterable
 
 sample_input = """\
@@ -35,27 +36,51 @@ Monkey 3:
 """.rstrip()
 
 
-def parse_items(line: str):
+def parse_items(line: str) -> list[int]:
+    """Parse the starting items being held by a monkey.
+
+    >>> parse_items("Starting items: 79, 60, 97")
+    [79, 60, 97]
+    """
     return [int(x) for x in line.split(": ")[1].split(", ")]
 
 
-def parse_operation(line: str):
+def parse_operation(line: str) -> Callable[[int], int]:
+    """
+    Parse a monkey's operation that modifies worry levels.
+
+    >>> parse_operation("Operation: new = old + 3")(5)
+    8
+    """
     _OPS = {
         "+": operator.add,
         "-": operator.sub,
         "*": operator.mul,
     }
 
-    def fn(old):
-        a, op, b = line.split("= ")[1].split()
-        a = old if a == "old" else int(a)
-        b = old if b == "old" else int(b)
+    def fn(old: int) -> int:
+        _a, op, _b = line.split("= ")[1].split()
+        a = old if _a == "old" else int(_a)
+        b = old if _b == "old" else int(_b)
         return _OPS[op](a, b)
 
     return fn
 
 
-def parse_behavior(lines: list[str]):
+def parse_behavior(lines: list[str]) -> tuple[Callable[[int], int], int]:
+    """
+    Parse the test and decision behavior (which monkey to throw the item to).
+
+    >>> lines = '''\
+    ...   Test: divisible by 17
+    ...     If true: throw to monkey 0
+    ...     If false: throw to monkey 1
+    ... '''.splitlines()
+    >>> parse_behavior(lines)[0](17)
+    0
+    >>> parse_behavior(lines)[0](20)
+    1
+    """
     div = int(lines[0].split()[-1])
     case_true = int(lines[1].split()[-1])
     case_false = int(lines[2].split()[-1])
@@ -72,7 +97,7 @@ def parse_behavior(lines: list[str]):
 Monkey = namedtuple("Monkey", ["items", "operation", "behavior", "div"])
 
 
-def parse_monkey(s: str):
+def parse_monkey(s: str) -> Monkey:
     """Parse a monkey behavior"""
     lines = s.splitlines()
     items = parse_items(lines[1])
@@ -83,6 +108,13 @@ def parse_monkey(s: str):
 
 
 def solve1(s: str) -> int:
+    """
+    Run 20 rounds of monkeys throwing items around and compute the monkey
+    business level.
+
+    The monkey business level is given by multiplying the number of item
+    inspections by the two most active monkeys.
+    """
     monkeys = {idx: parse_monkey(m) for idx, m in enumerate(s.split("\n\n"))}
     inspections: dict[int, int] = defaultdict(int)
 
@@ -110,7 +142,7 @@ def solve1(s: str) -> int:
     return x[0] * x[1]
 
 
-def prod(vals: Iterable[int | float]):
+def prod(vals: Iterable[int | float]) -> int | float:
     """Product of a sequence"""
     result: int | float = 1
     for v in vals:
@@ -118,7 +150,14 @@ def prod(vals: Iterable[int | float]):
     return result
 
 
-def solve2(s: str, rounds=10000) -> int:
+def solve2(s: str, rounds: int = 10000) -> int:
+    """
+    Run 10_000 rounds of monkey business.
+
+    This time the "division by 3" to reduce worry is no longer available.  The
+    approach now relies on keeping the worry levels within a value that does
+    not affect the computation of the next monkey in the sequence.
+    """
     monkeys = {idx: parse_monkey(m) for idx, m in enumerate(s.split("\n\n"))}
     inspections: dict[int, int] = defaultdict(int)
 
