@@ -94,10 +94,35 @@ def solve1(s: str) -> int:
     return seek(board=board, start_pos=S, target_pos=E)
 
 
+def solve2(s: str) -> int:
+    """
+    Find the shortest path to E from any of the lowest-height starting points
+    (height 'a').
+    """
+    E = (0, 0)
+    S = []
+
+    # find start and end coordinates
+    for i, line in enumerate(s.strip().splitlines()):
+        for j, letter in enumerate(line):
+            if letter == "E":
+                E = (i, j)
+            if letter == "a":
+                S.append((i, j))
+
+    board = parse_board(s)
+    return min(seek(board, s, E) for s in S)
+
+
 def test_sample_part1():
     assert solve1(sample_input) == 31
+
+
+def test_sample_part2():
+    assert solve2(sample_input) == 29
 
 
 if __name__ == "__main__":
     s = open("input.txt").read()
     print("part 1:", solve1(s))
+    print("part 2:", solve2(s))
