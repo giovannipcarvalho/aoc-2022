@@ -1,3 +1,5 @@
+import heapq
+
 sample_input = """\
 Sabqponm
 abcryxxl
@@ -46,30 +48,29 @@ def can_move(board: list[list[str]], src: tuple[int, int], dst: tuple[int, int])
 
 def seek(
     board: list[list[str]],
-    pos: tuple[int, int],
+    start_pos: tuple[int, int],
     target_pos: tuple[int, int],
-    distance=0,
-    seen=None,
-):
+) -> int:
     """
-    Recursively seek `target_pos` and return the minimum distance when it is found.
+    Find shortest path from `start_pos` to `target_pos` in `board` and return
+    its distance.
     """
-    if seen is None:
-        seen = [pos]
+    seen = set()
+    q = [(0, start_pos)]
+    seen.add(start_pos)
 
-    if pos == target_pos:
-        return distance
+    while len(q):
+        distance, pos = heapq.heappop(q)
 
-    neigh = [
-        n for n in neighbors(board, pos) if can_move(board, pos, n) and n not in seen
-    ]
-    if not len(neigh):
-        return float("inf")
+        if pos == target_pos:
+            return distance
 
-    return min(
-        seek(board, neighbor, target_pos, distance + 1, seen + [neighbor])
-        for neighbor in neigh
-    )
+        for neigh in neighbors(board, pos):
+            if can_move(board, pos, neigh) and neigh not in seen:
+                heapq.heappush(q, (distance + 1, neigh))
+                seen.add(neigh)
+
+    return 999999
 
 
 def solve1(s: str) -> int:
@@ -90,7 +91,7 @@ def solve1(s: str) -> int:
                 continue
 
     board = parse_board(s)
-    return seek(board=board, pos=S, target_pos=E)
+    return seek(board=board, start_pos=S, target_pos=E)
 
 
 def test_sample_part1():
